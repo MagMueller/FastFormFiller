@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auto Form Filler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            width: 300px; /* Increase width */
+            height: 400px; /* Increase height */
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 34px;
+            height: 20px;
+            margin-bottom: 20px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(14px);
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 5px;
+            font-size: 14px;
+        }
+        textarea {
+            height: 100px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px; /* Add margin to create space between buttons */
+        }
+    </style>
+</head>
+<body>
+    <h2>Auto Form Filler</h2>
+    <label class="switch">
+        <input type="checkbox" id="activate">
+        <span class="slider"></span>
+    </label>
+
+    <h3>API Key</h3>
+    <input type="text" id="apiKey" placeholder="Enter your API key">
+
+    <h3>Context Text</h3>
+    <textarea id="contextText" placeholder="Enter your context text"></textarea>
+
+    <button id="saveSettings">Save Settings</button>
+    
+    <button id="triggerFill">Fill Form</button>
+
+    <script src="popup.js"></script>
+</body>
+</html>
