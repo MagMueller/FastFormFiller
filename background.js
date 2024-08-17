@@ -28,6 +28,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             });
 
             loadContext.then(contextText => {
+
                 if (!apiKey) {
                     console.error('API Key is not set.');
                     sendResponse({ success: false, message: 'API Key is not set.' });
@@ -88,8 +89,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 function generatePrompt(contextText, formData) {
     console.log("Form Data:", formData);    
-    let prompt = `\nContext:\n${contextText}\n`;
-    prompt += `\nThe following are the form fields in the style of \nIndex: Type: Label \n the output should be JSON with keys the index and values the answer\n`;
+    let prompt = `Based on the following context, fill out the form and return the result as a JSON object where the keys are the form field indices, and the values are the corresponding answers. Ensure the response is a valid JSON object.\n\nContext:\n${contextText}\n`;
+    prompt += `\nForm fields: in the form Index: Type: Label \n`;
     formData.forEach((field, index) => {
         prompt += `${index}: ${field.type}: ${field.label}\n`;
     });         
