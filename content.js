@@ -32,13 +32,15 @@ function triggerFormFilling() {
 
     const formData = extractFormData();
     chrome.runtime.sendMessage({ action: 'processForm', data: formData }, function (response) {
+        
         if (response && response.success) {
             console.log("Form data processed successfully.");
         } else {
             console.log("Form data processing failed. Response:", response);
             console.log("Type of response:", typeof response);
             if (chrome.runtime.lastError) {
-                console.error("Runtime error:", chrome.runtime.lastError.message);
+                console.log("Runtime error:", chrome.runtime.lastError.message);
+                // console.error("Runtime error:", chrome.runtime.lastError.message);
             } else if (response && response.message) {
                 console.error("Error processing form data:", response.message);
             } else {

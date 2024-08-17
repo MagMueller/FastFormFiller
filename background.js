@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             const prompt = generatePrompt(contextText, request.data);
             console.log("Prompt:", prompt);
-
+            
             fetch("https://api.openai.com/v1/chat/completions", {
                 method: "POST",
                 headers: {
@@ -29,8 +29,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     max_tokens: 500,
                     response_format: { "type": "json_object" }  // Ensure JSON response format
                 }),
+            }
+            
+        )
+            .then(response => {
+                console.log("Converted response to JSON");
+                return response.json();
             })
-            .then(response => response.json())
             .then(data => {
                 console.log("LLM Response:", JSON.stringify(data, null, 2));
 
