@@ -10,7 +10,7 @@ export async function fetchLLMResponse(apiKey, prompt) {
         body: JSON.stringify({
             model: "gpt-4o-2024-08-06",
             messages: [
-                { role: "system", content: "Fill out the form based on the given context and return the result as a JSON object where the keys are the same IDs, and the values are the corresponding answers. If an answer is not known, use '" + unknownValue + "' as the value. Ensure the response is a valid JSON object." },
+                { role: "system", content: "Use " + unknownValue + " as the value for any unknown fields." },
                 { role: "user", content: prompt }
             ],
             max_tokens: 1500,
