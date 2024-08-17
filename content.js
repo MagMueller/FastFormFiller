@@ -13,13 +13,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             // Use setFieldValue to ensure the value is set properly
             try {
                 if (element.type === 'radio') {
-                    if (element.value === value) {
-                        element.checked = true;
-                    } else {
-                        element.checked = false;
-                    }
+                    setRadioValue(element.name, value);
                 } else if (element.type === 'checkbox') {
-                    element.checked = value.toLowerCase() === 'true';
+                    setCheckboxValue(element.name, value);
                 } else if (element.tagName.toLowerCase() === 'select') {
                     setSelectValue(element, value);
                 } else {
@@ -67,43 +63,55 @@ function setSelectValue(element, value) {
     }
 }
 
+function setRadioValue(name, value) {
+    const radioButtons = document.querySelectorAll(`input[name="${name}"]`);
+    radioButtons.forEach(radio => {
+        if (radio.value === value || radio.nextElementSibling.innerText === value) {
+            radio.checked = true;
+            const changeEvent = new Event('change', { bubbles: true });
+            radio.dispatchEvent(changeEvent);
+        }
+    });
+}
+
+function setCheckboxValue(name, value) {
+    const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
+    checkboxes.forEach(checkbox => {
+        if (checkbox.value === value || checkbox.nextElementSibling.innerText === value) {
+            checkbox.checked = value === "true";
+            const changeEvent = new Event('change', { bubbles: true });
+            checkbox.dispatchEvent(changeEvent);
+        }
+    });
+}
+
 function extractFormData() {
+    console.log("Extracting form data...");
     const formElements = document.querySelectorAll('input[type="text"], textarea, select, input[type="radio"], input[type="checkbox"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], input[type="url"], input[type="tel"]');
     console.log("Extracted form elements:", formElements);
 
-    const formData = [];
-    let currentQuestion = '';
-
-    formElements.forEach((element) => {
-        // Check if the previous sibling is a question label
-        const previousElement = element.previousElementSibling;
-        if (previousElement && previousElement.tagName.toLowerCase() === 'label') {
-            currentQuestion = previousElement.innerText;
-        }
-
-        // If the element is a radio or checkbox, prepend the question to the label
-        let label = document.querySelector(`label[for="${element.id}"]`)?.innerText || element.placeholder;
-        if (element.type === 'radio' || element.type === 'checkbox') {
-            label = `${currentQuestion} ${label}`;
-        }
-
+    const formData = Array.from(formElements).map((element) => {
         const fieldData = {
             id: element.id || element.name,  // Use either ID or name as the key
-            label: label,
+            label: document.querySelector(`label[for="${element.id}"]`)?.innerText || element.placeholder,
             type: element.type,
             value: element.type === 'checkbox' ? element.checked : element.value,
         };
         console.log("Extracted field data:", fieldData);
-        formData.push(fieldData);
+        return fieldData;
     });
 
-    return formData;
+    // Extract the entire text content of the website
+    const websiteText = document.body.innerText;
+    console.log("Website Text:", websiteText);
+
+    return { formData, websiteText };
 }
 
 // Extract form data and trigger the form-filling process
 function triggerFormFilling() {
-    const formData = extractFormData();
-    chrome.runtime.sendMessage({ action: 'processForm', data: formData }, function (response) {
+    const { formData, websiteText } = extractFormData();
+    chrome.runtime.sendMessage({ action: 'processForm', data: formData, websiteText: websiteText }, function (response) {
         if (response && response.success) {
             console.log("Form data processed successfully.");
         } else {

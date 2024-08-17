@@ -28,14 +28,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             });
 
             loadContext.then(contextText => {
-
+                console.log("Context Text:", contextText);
                 if (!apiKey) {
                     console.error('API Key is not set.');
                     sendResponse({ success: false, message: 'API Key is not set.' });
                     return;
                 }
-
-                const prompt = generatePrompt(contextText, request.data);
+                const formData = request.data;
+                const websiteText = request.websiteText;
+                const prompt = generatePrompt(contextText, formData, websiteText);
                 console.log("Prompt:", prompt);
 
                 // Call the function to fetch LLM response
@@ -49,7 +50,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
                             // Map the response back to field IDs
                             const mappedResponse = {};
-                            request.data.forEach((field, index) => {
+                            formData.forEach((field, index) => {
                                 if (jsonResponse.hasOwnProperty(index)) {
                                     mappedResponse[field.id] = jsonResponse[index];
                                 }
@@ -87,9 +88,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
-function generatePrompt(contextText, formData) {
-    console.log("Form Data:", formData);    
-    let prompt = `Based on the following context, fill out the form and return the result as a JSON object where the keys are the form field indices, and the values are the corresponding answers. Ensure the response is a valid JSON object.\n\nContext:\n${contextText}\n`;
+function generatePrompt(contextText, formData, websiteText) {
+    console.log("Form Data:", formData);   
+    console.log("Website Text:", websiteText);
+    let prompt = `Based on the following context and the website content, fill out the form and return the result as a JSON object where the keys are the form field indices, and the values are the corresponding answers. Ensure the response is a valid JSON object.\n\nContext:\n${contextText}\n\nWebsite Content:\n${websiteText}\n`;
     prompt += `\nForm fields: in the form Index: Type: Label \n`;
     formData.forEach((field, index) => {
         prompt += `${index}: ${field.type}: ${field.label}\n`;
