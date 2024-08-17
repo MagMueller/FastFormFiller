@@ -8,84 +8,96 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             let contextText = data.contextText || "Default context text if none is set.";
             const apiKey = data.apiKey || "";
 
-            if (DEBUG) {
-                // load context text from file
-                contextText = `
-                Company Name: Tech Innovators Inc.
-
-                Address:
-                123 Innovation Drive
-                Techville, CA 94043
-                USA
-
-                Company Info:
-                Tech Innovators Inc. is a leading technology company specializing in innovative solutions for the modern world. Our mission is to drive technological advancements and provide cutting-edge products and services to our customers.
-                Founded: 2005   
-                Employees: 500+
-                Industry: Technology
-
-                Key Numbers:
-                Annual Revenue: $50 million
-                Market Share: 15%
-                Customer Satisfaction: 95%
-                Growth Rate: 10% year-over-year
-
-                Vision
-                To be the global leader in technology innovation, empowering businesses and individuals to achieve their full potential through our advanced solutions and services.
-                `;
-            }
-            console.log("Context Text:", contextText);
-            if (!apiKey) {
-                console.error('API Key is not set.');
-                sendResponse({ success: false, message: 'API Key is not set.' });
-                return;
-            }
-
-            const prompt = generatePrompt(contextText, request.data);
-            console.log("Prompt:", prompt);
-
-            // Call the function to fetch LLM response
-            fetchLLMResponse(apiKey, prompt)
-                .then(data => {
-                    console.log("LLM Response:", JSON.stringify(data, null, 2));
-
-                    if (data.choices && data.choices.length > 0) {
-                        const jsonResponse = parseLLMResponse(data.choices[0].message.content);
-                        console.log("Parsed JSON Response:", jsonResponse);
-
-                        // Send message to content script
-                        chrome.tabs.sendMessage(sender.tab.id, {
-                            action: "fillForm",
-                            data: jsonResponse,
-                        }, function(response) {
-                            if (chrome.runtime.lastError) {
-                                console.error("Failed to send message:", chrome.runtime.lastError.message);
-                            } else {
-                                console.log("Form filling message sent successfully.");
-                            }
+            const loadContext = new Promise((resolve, reject) => {
+                if (DEBUG) {
+                    // load context text from file
+                    fetch(chrome.runtime.getURL('exampleContext.txt'))
+                        .then(response => response.text())
+                        .then(text => {
+                            contextText = text;
+                            console.log("Loaded context text from file:", contextText);
+                            resolve(contextText);
+                        })
+                        .catch(error => {
+                            console.error("Failed to load context text from file:", error);
+                            reject(error);
                         });
-                        sendResponse({ success: true });
-                    } else {
-                        console.error("No valid choices in the LLM response:", JSON.stringify(data, null, 2));
-                        sendResponse({ success: false, message: 'No valid choices in the LLM response.' });
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching LLM response:", error);
-                    sendResponse({ success: false, message: 'Error fetching LLM response.' });
-                });
+                } else {
+                    resolve(contextText);
+                }
+            });
 
-            // Indicate that the response will be sent asynchronously
-            return true;
+            loadContext.then(contextText => {
+                if (!apiKey) {
+                    console.error('API Key is not set.');
+                    sendResponse({ success: false, message: 'API Key is not set.' });
+                    return;
+                }
+
+                const prompt = generatePrompt(contextText, request.data);
+                console.log("Prompt:", prompt);
+
+                // Call the function to fetch LLM response
+                fetchLLMResponse(apiKey, prompt)
+                    .then(data => {
+                        console.log("LLM Response:", JSON.stringify(data, null, 2));
+
+                        if (data.choices && data.choices.length > 0) {
+                            const jsonResponse = parseLLMResponse(data.choices[0].message.content);
+                            console.log("Parsed JSON Response:", jsonResponse);
+
+                            // Map the response back to field IDs
+                            const mappedResponse = {};
+                            request.data.forEach((field, index) => {
+                                if (jsonResponse.hasOwnProperty(index)) {
+                                    mappedResponse[field.id] = jsonResponse[index];
+                                }
+                            });
+                            console.log("Mapped Response:", mappedResponse);
+
+                            // Send message to content script
+                            chrome.tabs.sendMessage(sender.tab.id, {
+                                action: "fillForm",
+                                data: mappedResponse,
+                            }, function(response) {
+                                if (chrome.runtime.lastError) {
+                                    console.error("Failed to send message:", chrome.runtime.lastError.message);
+                                } else {
+                                    console.log("Form filling message sent successfully.");
+                                }
+                            });
+                            sendResponse({ success: true });
+                        } else {
+                            console.error("No valid choices in the LLM response:", JSON.stringify(data, null, 2));
+                            sendResponse({ success: false, message: 'No valid choices in the LLM response.' });
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching LLM response:", error);
+                        sendResponse({ success: false, message: 'Error fetching LLM response.' });
+                    });
+
+                // Indicate that the response will be sent asynchronously
+                return true;
+            }).catch(error => {
+                sendResponse({ success: false, message: 'Failed to load context text.' });
+            });
         });
     }
 });
 
 function generatePrompt(contextText, formData) {
-    let prompt = `Based on the following context, fill out the form and return the result as a JSON object where the keys are the form field IDs, and the values are the corresponding answers. If an answer is not known, use "unknown" as the value. Ensure the response is a valid JSON object.\n\nContext:\n${contextText}\n\nForm fields:\n`;
+    console.log("Form Data:", formData);    
+    let prompt = `\nContext:\n${contextText}\n`;
+    prompt += `\nThe following are the form fields in the style of \nIndex: Type: Label \n the output should be JSON with keys the index and values the answer\n`;
     formData.forEach((field, index) => {
-        prompt += `${index + 1}. Field ID: ${field.id}, Label: ${field.label}, Type: ${field.type}\n`;
-    });
+        prompt += `${index}: ${field.type}: ${field.label}\n`;
+    });         
+    prompt += `\nInstructions:\n`;
+    prompt += `- For text inputs and textareas, return the text value.\n`;
+    prompt += `- For checkboxes, return "true" if it should be checked, otherwise "false".\n`;
+    prompt += `- For radio buttons, return "true" for the option that should be selected, otherwise "false".\n`;
+    prompt += `- For dropdown menus (select elements), return the value or text of the option that should be selected.\n`;
     return prompt;
 }
 

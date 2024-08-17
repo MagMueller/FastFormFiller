@@ -5,7 +5,8 @@
     "description": "Automatically fill forms using an LLM",
     "permissions": ["storage", "activeTab", "scripting"],
     "background": {
-      "service_worker": "background.js"
+      "service_worker": "background.js",
+      "type": "module"
     },
     "action": {
       "default_popup": "popup.html",
@@ -34,6 +35,11 @@
         "js": ["content.js"]
       }
     ],
-    "options_page": "options.html"
+    "options_page": "options.html",
+    "web_accessible_resources": [
+      {
+        "resources": ["exampleContext.txt"],
+        "matches": ["<all_urls>"]
+      }
+    ]
   }
-  
