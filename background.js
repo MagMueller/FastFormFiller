@@ -3,6 +3,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         chrome.storage.sync.get(['contextText', 'apiKey'], function (data) {
             const contextText = data.contextText || "Default context text if none is set.";
             const apiKey = data.apiKey || "";
+            const unknownValue = "unknown";
 
             if (!apiKey) {
                 console.error('API Key is not set.');
@@ -11,7 +12,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             }
 
             const prompt = generatePrompt(contextText, request.data);
-            console.log("Generated Prompt:", prompt);
+            console.log("Prompt:", prompt);
 
             fetch("https://api.openai.com/v1/chat/completions", {
                 method: "POST",
@@ -20,12 +21,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     "Authorization": `Bearer ${apiKey}`,
                 },
                 body: JSON.stringify({
-                    model: "gpt-3.5-turbo",
+                    model: "gpt-4o-2024-08-06",
                     messages: [
-                        { role: "system", content: "You are a helpful assistant that fills out forms based on given context." },
+                        { role: "system", content: "Fill out the form based on the given context and return the result as a JSON object where the keys are the form field IDs, and the values are the corresponding answers. If an answer is not known, use '" + unknownValue + "' as the value. Ensure the response is a valid JSON object." },
                         { role: "user", content: prompt }
                     ],
                     max_tokens: 500,
+                    response_format: { "type": "json_object" }  // Ensure JSON response format
                 }),
             })
             .then(response => response.json())
@@ -47,7 +49,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                             console.log("Form filling message sent successfully.");
                         }
                     });
-
+                    console.log("Form filling message sent successfully.");
                     sendResponse({ success: true });
                 } else {
                     console.error("No valid choices in the LLM response:", JSON.stringify(data, null, 2));
@@ -55,18 +57,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 }
             })
             .catch(error => {
-                console.error("Error with LLM API request:", error);
-                sendResponse({ success: false, message: 'Error with LLM API request.' });
+                console.error("Error fetching LLM response:", error);
+                sendResponse({ success: false, message: 'Error fetching LLM response.' });
             });
 
-            // Keeps the message channel open for asynchronous response
+            // Indicate that the response will be sent asynchronously
             return true;
         });
     }
 });
 
 function generatePrompt(contextText, formData) {
-    let prompt = `Based on the following context, fill out the form and return the result as a JSON object where the keys are the form field IDs, and the values are the corresponding answers. If an answer is not known, use "unknown" as the value.\n\nContext:\n${contextText}\n\nForm fields:\n`;
+    let prompt = `Based on the following context, fill out the form and return the result as a JSON object where the keys are the form field IDs, and the values are the corresponding answers. If an answer is not known, use "unknown" as the value. Ensure the response is a valid JSON object.\n\nContext:\n${contextText}\n\nForm fields:\n`;
     formData.forEach((field, index) => {
         prompt += `${index + 1}. Field ID: ${field.id}, Label: ${field.label}, Type: ${field.type}\n`;
     });
@@ -78,7 +80,7 @@ function parseLLMResponse(response) {
         return JSON.parse(response);
     } catch (e) {
         console.error("Failed to parse JSON from LLM response:", e);
-        return {};
+        throw e;  // Rethrow the error to be caught in the fetch handler
     }
 }
 

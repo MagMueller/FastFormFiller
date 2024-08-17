@@ -29,19 +29,24 @@ function extractFormData() {
 
 // Extract form data and trigger the form-filling process
 function triggerFormFilling() {
-    chrome.storage.sync.get('isActive', function (data) {
-        console.log("Extension active state:", data.isActive);
-        if (data.isActive) {
-            const formData = extractFormData();
-            chrome.runtime.sendMessage({ action: 'processForm', data: formData }, function (response) {
-                if (response && response.success) {
-                    console.log("Form data processed successfully.");
-                } else {
-                    console.error("Error processing form data:", response?.message || "Unknown error");
-                }
-            });
+
+    const formData = extractFormData();
+    chrome.runtime.sendMessage({ action: 'processForm', data: formData }, function (response) {
+        if (response && response.success) {
+            console.log("Form data processed successfully.");
+        } else {
+            console.log("Form data processing failed. Response:", response);
+            console.log("Type of response:", typeof response);
+            if (chrome.runtime.lastError) {
+                console.error("Runtime error:", chrome.runtime.lastError.message);
+            } else if (response && response.message) {
+                console.error("Error processing form data:", response.message);
+            } else {
+            console.error("Unknown error occurred while processing form data");
         }
+    }
     });
+    
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -69,5 +74,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "triggerFill") {
         console.log("Triggering form filling...");
         triggerFormFilling();
+        sendResponse({ success: true });
     }
+
+    // Indicate that the response will be sent asynchronously
+    return true;
 });

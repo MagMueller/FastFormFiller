@@ -1,7 +1,7 @@
 // Load saved settings when the popup opens
 document.addEventListener('DOMContentLoaded', function () {
-    chrome.storage.sync.get(['isActive', 'apiKey', 'contextText'], function (data) {
-        document.getElementById('activate').checked = data.isActive || false;
+    chrome.storage.sync.get(['apiKey', 'contextText'], function (data) {
+
         document.getElementById('apiKey').value = data.apiKey || '';
         document.getElementById('contextText').value = data.contextText || '';
     });
@@ -14,12 +14,10 @@ document.getElementById('triggerFill').addEventListener('click', function() {
 
 // Save settings when the save button is clicked
 document.getElementById('saveSettings').addEventListener('click', function () {
-    const isActive = document.getElementById('activate').checked;
     const apiKey = document.getElementById('apiKey').value;
     const contextText = document.getElementById('contextText').value;
 
     chrome.storage.sync.set({
-        isActive: isActive,
         apiKey: apiKey,
         contextText: contextText
     }, function () {
