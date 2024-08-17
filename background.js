@@ -35,6 +35,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 if (data.choices && data.choices.length > 0) {
                     const jsonResponse = parseLLMResponse(data.choices[0].message.content);
                     console.log("Parsed JSON Response:", jsonResponse);
+
+                    // Send message to content script
                     chrome.tabs.sendMessage(sender.tab.id, {
                         action: "fillForm",
                         data: jsonResponse,
@@ -45,6 +47,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                             console.log("Form filling message sent successfully.");
                         }
                     });
+
                     sendResponse({ success: true });
                 } else {
                     console.error("No valid choices in the LLM response:", JSON.stringify(data, null, 2));
@@ -56,7 +59,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 sendResponse({ success: false, message: 'Error with LLM API request.' });
             });
 
-            return true;  // Keeps the message channel open for asynchronous response
+            // Keeps the message channel open for asynchronous response
+            return true;
         });
     }
 });
