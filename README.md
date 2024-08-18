@@ -8,7 +8,7 @@
 - **Specify Context once and use it for all your form filling tasks**
 - **Uncertainty Handling** 
 - **Fast and Easy**
-![Auto Form Filler Thumbnail](images/thumbnail.webp)
+![Auto Form Filler Thumbnail](src/images/thumbnail.webp)
 
 ## 🛠 Installation
 

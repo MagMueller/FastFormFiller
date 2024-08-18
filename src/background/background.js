@@ -1,4 +1,4 @@
-import { fetchGPTResponse } from './openAiUtils.js';
+import { fetchGPTResponse } from '../utils/openAiUtils.js';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'processForm') {
