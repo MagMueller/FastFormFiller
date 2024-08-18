@@ -7,11 +7,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         chrome.storage.sync.get(['contextText', 'apiKey', 'modelSelection', 'uncertaintyHandling'], function (data) {
             let contextText = data.contextText || "Default context text if none is set.";
             const apiKey = data.apiKey || "";
+            const modelSelection = data.modelSelection !== undefined ? Number(data.modelSelection) : 0;
+            const uncertaintyHandling = data.uncertaintyHandling !== undefined ? Number(data.uncertaintyHandling) : 0;
+            console.log("model.data", data.modelSelection);
+            const model = modelSelection === 1 ? "gpt-4o-2024-08-06" : "gpt-3.5-turbo-0125";
+            const uncertaintyInstruction = uncertaintyHandling === 1 ? "Use 'unknown' as the value for any fields you are not sure about." : "Guess the value creatively if unknown.";
 
-            const model = data.modelSelection === 1 ? "gpt-4" : "gpt-3.5-turbo";
-            const uncertaintyInstruction = data.uncertaintyHandling === 1 ? "Use 'unknown' as the value for any fields you are not sure about." : "Guess the value creatively if unknown.";
+            console.log("Model Selection:", modelSelection);
+            console.log("Model:", model);
+
             console.log("Uncertainty Instruction:", uncertaintyInstruction);
             console.log("Context Text:", contextText);
+
             if (!apiKey) {
                 console.error('API Key is not set.');
                 sendResponse({ success: false, message: 'API Key is not set.' });
@@ -49,14 +56,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                             data: mappedResponse,
                         }, function(response) {
                             if (chrome.runtime.lastError) {
-                                console.error("Failed to send message:", chrome.runtime.lastError.message);
+                                console.log("Failed to send message:", chrome.runtime.lastError.message);
                             } else {
                                 console.log("Form filling command sent successfully.");
                             }
                         });
                         sendResponse({ success: true });
                     } else {
-                        console.error("No valid choices in the LLM response:", JSON.stringify(data, null, 2));
+                        console.log("No valid choices in the LLM response:", JSON.stringify(data, null, 2));
                         sendResponse({ success: false, message: 'No valid choices in the LLM response.' });
                     }
                 })
