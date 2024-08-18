@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Auto Form Filler",
+  "version": "1.0",
+  "description": "Automatically fill forms using an LLM",
+  "permissions": ["storage", "activeTab", "scripting", "commands"],
+  "background": {
+      "service_worker": "src/background/background.js",
+      "type": "module"
+  },
+  "action": {
+      "default_popup": "src/popup/popup.html",
+      "default_icon": {
+          "16": "src/icons/icon16.png",
+          "48": "src/icons/icon48.png",
+          "128": "src/icons/icon128.png"
+      }
+  },
+  "icons": {
+      "16": "src/icons/icon16.png",
+      "48": "src/icons/icon48.png",
+      "128": "src/icons/icon128.png"
+  },
+  "commands": {
+      "trigger_form_filling": {
+          "suggested_key": {
+              "default": "Ctrl+Shift+Y"
+          },
+          "description": "Trigger form filling"
+      },
+      "trigger_cell_filling": {
+          "suggested_key": {
+              "default": "Ctrl+Shift+A"
+          },
+          "description": "Trigger cell filling"
+      }
+  },
+  "content_scripts": [
+      {
+          "matches": ["<all_urls>"],
+          "js": ["src/content/content.js"]
+      }
+  ]
+}
