@@ -4,9 +4,10 @@
 
 ## 🚀 Features
 
-- **AI-Powered Form Filling:** Automatically fill entire forms using.
-- **Customizable Context:** Add specific context once and use it for all your form filling tasks.
-
+- **Automatically fill entire forms** 
+- **Specify Context once and use it for all your form filling tasks**
+- **Uncertainty Handling** 
+- **Fast and Easy**
 ![Auto Form Filler Thumbnail](images/thumbnail.webp)
 
 ## 🛠 Installation
