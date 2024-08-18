@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Auto Form Filler</title>
+    <title>Auto Form Filler Settings</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,28 +17,13 @@
             margin-top: 10px;
             font-weight: bold;
         }
-        input, textarea, button {
+        input, textarea {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .fill-button {
-            background-color: #007BFF;
-        }
-        .fill-button:hover {
-            background-color: #0056b3;
         }
         .link {
             display: block;
@@ -53,18 +38,19 @@
     </style>
 </head>
 <body>
-    <h2>Auto Form Filler</h2>
+    <h2>Auto Form Filler Settings</h2>
     <label for="apiKey">API Key:</label>
     <input type="password" id="apiKey" placeholder="Enter your API key - it's encrypted">
     
     <label for="contextText">Context Text:</label>
     <textarea id="contextText" placeholder="Enter your context text"></textarea>
     
-    <button id="saveSettings">Save Settings</button>
-    <button id="triggerPageFill" class="fill-button">Fill Form</button>
-    <button id="triggerCurrentFieldFill" class="fill-button">Fill Current Field</button>
+    <h2>Shortcut Settings</h2>
+    <label for="formFillingShortcut">Form Filling Shortcut:</label>
+    <input type="text" id="formFillingShortcut" placeholder="Press keys to set shortcut" readonly>
     
-    <a href="options.html" target="_blank" class="link">Customize Shortcuts</a>
+    <label for="cellFillingShortcut">Cell Filling Shortcut:</label>
+    <input type="text" id="cellFillingShortcut" placeholder="Press keys to set shortcut" readonly>
     
     <script src="popup.js"></script>
 </body>
