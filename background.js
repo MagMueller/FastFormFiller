@@ -86,16 +86,16 @@ function triggerCellFilling() {
 }
 
 function generatePrompt(contextText, formData, websiteText) {
-    let prompt = `Based on the following context and the website content, fill out the requested form field(s) and return the result as a JSON object where the keys are the form field indices, and the values are the corresponding answers. Ensure the response is a valid JSON object.\n\nContext:\n${contextText}\n\nWebsite Content:\n${websiteText}\n`;
-    prompt += `\nForm fields to fill out given in the form (Index: Type: Label):\n`;
+    let prompt = `Based on the following context and the website content, fill out the requested form field(s) and return the result as a JSON object.`;
+    prompt += `In your output JSON the key musst be the Unique ID from the input list and the value is the answer. `;
+    prompt += `The output should have only the Unique IDs from the input list and the answers. If you don't know the answer, use "unknown" as the value. `;
+    prompt += `Like {1: "answer", ...}. \n\nContext:\n${contextText}\n\nWebsite Content:\n${websiteText}\n`;
+    prompt += `\nForm fields to fill out given in the form (Unique ID 0: Question1, Unique ID 1: Question2, ...):\n`;
+    prompt += `{`;
     formData.forEach((field, index) => {
-        prompt += `${index}: ${field.type}: ${field.label}\n`;
+        prompt += `${index}: ${field.label}\n`;
     });         
-    prompt += `\nInstructions:\n`;
-    prompt += `- For text inputs and textareas, return the text value.\n`;
-    prompt += `- For checkboxes, return "true" if it should be checked, otherwise "false".\n`;
-    prompt += `- For radio buttons, return "true" for the option that should be selected, otherwise "false".\n`;
-    prompt += `- For dropdown menus (select elements), return the value or text of the option that should be selected.\n`;
+    prompt += `}`;
     return prompt;
 }
 
@@ -103,7 +103,7 @@ function parseLLMResponse(response) {
     try {
         return JSON.parse(response);
     } catch (e) {
-        console.error("Failed to parse JSON from LLM response:", e);
+        console.log("Failed to parse JSON from LLM response:", e);
         throw e;  
     }
 }

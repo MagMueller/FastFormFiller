@@ -1,29 +1,21 @@
+const formFields = 'input[type="text"], textarea, input[type="email"], input[type="number"], input[type="date"], input[type="url"], input[type="tel"]';
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("Received message in content.js:", request);
 
     if (request.action === 'fillForm') {
         const suggestions = request.data;
         console.log("Received suggestions:", suggestions);
-
-        document.querySelectorAll('input[type="text"], textarea, select, input[type="radio"], input[type="checkbox"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], input[type="url"], input[type="tel"]').forEach((element) => {
+        // select, input[type="radio"], input[type="checkbox"],
+        
+        document.querySelectorAll(formFields).forEach((element) => {
             const key = element.id || element.name;  // Use either ID or name as the key
             if (key in suggestions) {  // Only update if the key is in suggestions
                 const value = suggestions[key];
                 console.log(`Filling field with ID: ${key} with value: ${value} (type: ${element.type})`);
-
-                // Use setFieldValue to ensure the value is set properly
                 try {
-                    if (element.type === 'radio') {
-                        console.log(`Setting radio value for key: ${key}, value: ${value}`);
-                        setRadioValue(element, value);
-                    } else if (element.type === 'checkbox') {
-                        console.log(`Setting checkbox value for key: ${key}, value: ${value}`);
-                        setCheckboxValue(element, value);
-                    } else {
-                        setFieldValue(element, value);
-                    }
+                    setFieldValue(element, value);
                 } catch (error) {
-                    console.error(`Error setting value for field with ID: ${key}`, error);
+                    console.error(`Error setting value for field with ID: ${key} with value: ${value}`, error);
                 }
             }
         });
@@ -46,33 +38,39 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
 });
 
-function setFieldValue(element, value) {
-    if (element.tagName === 'SELECT') {
-        const option = Array.from(element.options).find(opt => opt.value === value || opt.text === value);
-        if (option) {
-            element.value = option.value;
+function findQuestionForInput(inputElement) {
+    console.log("Finding question for input:", inputElement);
+    if (inputElement.id) {
+        const label = document.querySelector(`label[for="${inputElement.id}"]`);
+        console.log("Found question via for= label:", label);
+        if (label) {
+            return label.innerText.trim();
         }
-    } else {
-        element.value = value;
     }
+    
+    if (inputElement.hasAttribute('aria-labelledby')) {
+        const labelId = inputElement.getAttribute('aria-labelledby');
+        const ariaLabel = document.getElementById(labelId);
+        console.log("Found question via aria-labelledby:", ariaLabel);
+        if (ariaLabel) {
+            return ariaLabel.innerText.trim();
+        }
+    }
+    
+    return null;
+}
+function setFieldValue(element, value) {
+    element.value = value;
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+    element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
-function setRadioValue(element, value) {
-    if (element.value === value) {
-        element.checked = true;
-    }
-}
-
-function setCheckboxValue(element, value) {
-    element.checked = value === 'true' || value === true;
-}
 
 function extractFieldData(element) {
     const fieldData = {
         id: element.id || element.name,  // Use either ID or name as the key
-        label: document.querySelector(`label[for="${element.id}"]`)?.innerText || element.placeholder,
-        type: element.type,
-        value: element.type === 'checkbox' ? element.checked : element.value,
+        label: findQuestionForInput(element),
+        type: element.type
     };
     console.log("Extracted field data:", fieldData);
     return fieldData;
@@ -86,8 +84,7 @@ function extractCurrentFieldData() {
 }
 
 function extractPageData() {
-    const formElements = document.querySelectorAll('input[type="text"], textarea, select, input[type="radio"], input[type="checkbox"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], input[type="url"], input[type="tel"]');
-    console.log("Extracted form elements:", formElements);
+    const formElements = document.querySelectorAll(formFields);
 
     const formData = Array.from(formElements).map(extractFieldData);
     const websiteText = document.body.innerText;
@@ -106,9 +103,9 @@ function triggerPageFilling() {
             if (chrome.runtime.lastError) {
                 console.log("Runtime error:", chrome.runtime.lastError.message);
             } else if (response && response.message) {
-                console.error("Error processing form data:", response.message);
+                console.log("Error processing form data:", response.message);
             } else {
-                console.error("Unknown error occurred while processing form data");
+                console.log("Unknown error occurred while processing form data");
             }
         }
     });
@@ -125,9 +122,9 @@ function triggerCurrentFieldFilling() {
             if (chrome.runtime.lastError) {
                 console.log("Runtime error:", chrome.runtime.lastError.message);
             } else if (response && response.message) {
-                console.error("Error processing form data:", response.message);
+                console.log("Error processing form data:", response.message);
             } else {
-                console.error("Unknown error occurred while processing form data");
+                console.log("Unknown error occurred while processing form data");
             }
         }
     });

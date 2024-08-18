@@ -1,5 +1,4 @@
 export async function fetchGPTResponse(apiKey, prompt, bigModel) {
-    const unknownValue = "unknown";
 
     const model = bigModel ?  "gpt-4o-2024-08-06" : "gpt-3.5-turbo-0125";
     console.log("using model", model);
@@ -13,7 +12,6 @@ export async function fetchGPTResponse(apiKey, prompt, bigModel) {
         body: JSON.stringify({
             model: model,
             messages: [
-                { role: "system", content: "Use " + unknownValue + " as the value for any unknown fields." },
                 { role: "user", content: prompt }
             ],
             max_tokens: 1500,
