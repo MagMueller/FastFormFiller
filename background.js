@@ -1,4 +1,4 @@
-import { fetchLLMResponse } from './llmUtils.js';
+import { fetchGPTResponse } from './openAiUtils.js';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'processForm') {
@@ -18,7 +18,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log("Prompt:", prompt);
 
             // Call the function to fetch LLM response
-            fetchLLMResponse(apiKey, prompt)
+            fetchGPTResponse(apiKey, prompt)
                 .then(data => {
                     console.log("LLM Response:", JSON.stringify(data, null, 2));
 
