@@ -1,5 +1,3 @@
-const DEBUG = true; // Set this to false in production
-
 import { fetchLLMResponse } from './llmUtils.js';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -8,82 +6,59 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             let contextText = data.contextText || "Default context text if none is set.";
             const apiKey = data.apiKey || "";
 
-            const loadContext = new Promise((resolve, reject) => {
-                if (DEBUG) {
-                    // load context text from file
-                    fetch(chrome.runtime.getURL('exampleContext.txt'))
-                        .then(response => response.text())
-                        .then(text => {
-                            contextText = text;
-                            console.log("Loaded context text from file:", contextText);
-                            resolve(contextText);
-                        })
-                        .catch(error => {
-                            console.error("Failed to load context text from file:", error);
-                            reject(error);
+            console.log("Context Text:", contextText);
+            if (!apiKey) {
+                console.error('API Key is not set.');
+                sendResponse({ success: false, message: 'API Key is not set.' });
+                return;
+            }
+            const formData = request.data;
+            const websiteText = request.websiteText;
+            const prompt = generatePrompt(contextText, formData, websiteText);
+            console.log("Prompt:", prompt);
+
+            // Call the function to fetch LLM response
+            fetchLLMResponse(apiKey, prompt)
+                .then(data => {
+                    console.log("LLM Response:", JSON.stringify(data, null, 2));
+
+                    if (data.choices && data.choices.length > 0) {
+                        const jsonResponse = parseLLMResponse(data.choices[0].message.content);
+                        console.log("Parsed JSON Response:", jsonResponse);
+
+                        // Map the response back to field IDs
+                        const mappedResponse = {};
+                        formData.forEach((field, index) => {
+                            if (jsonResponse.hasOwnProperty(index)) {
+                                mappedResponse[field.id] = jsonResponse[index];
+                            }
                         });
-                } else {
-                    resolve(contextText);
-                }
-            });
+                        console.log("Mapped Response:", mappedResponse);
 
-            loadContext.then(contextText => {
-                console.log("Context Text:", contextText);
-                if (!apiKey) {
-                    console.error('API Key is not set.');
-                    sendResponse({ success: false, message: 'API Key is not set.' });
-                    return;
-                }
-                const formData = request.data;
-                const websiteText = request.websiteText;
-                const prompt = generatePrompt(contextText, formData, websiteText);
-                console.log("Prompt:", prompt);
+                        // Send message to content script
+                        chrome.tabs.sendMessage(sender.tab.id, {
+                            action: "fillForm",
+                            data: mappedResponse,
+                        }, function(response) {
+                            if (chrome.runtime.lastError) {
+                                console.error("Failed to send message:", chrome.runtime.lastError.message);
+                            } else {
+                                console.log("Form filling message sent successfully.");
+                            }
+                        });
+                        sendResponse({ success: true });
+                    } else {
+                        console.error("No valid choices in the LLM response:", JSON.stringify(data, null, 2));
+                        sendResponse({ success: false, message: 'No valid choices in the LLM response.' });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching LLM response:", error);
+                    sendResponse({ success: false, message: 'Error fetching LLM response.' });
+                });
 
-                // Call the function to fetch LLM response
-                fetchLLMResponse(apiKey, prompt)
-                    .then(data => {
-                        console.log("LLM Response:", JSON.stringify(data, null, 2));
-
-                        if (data.choices && data.choices.length > 0) {
-                            const jsonResponse = parseLLMResponse(data.choices[0].message.content);
-                            console.log("Parsed JSON Response:", jsonResponse);
-
-                            // Map the response back to field IDs
-                            const mappedResponse = {};
-                            formData.forEach((field, index) => {
-                                if (jsonResponse.hasOwnProperty(index)) {
-                                    mappedResponse[field.id] = jsonResponse[index];
-                                }
-                            });
-                            console.log("Mapped Response:", mappedResponse);
-
-                            // Send message to content script
-                            chrome.tabs.sendMessage(sender.tab.id, {
-                                action: "fillForm",
-                                data: mappedResponse,
-                            }, function(response) {
-                                if (chrome.runtime.lastError) {
-                                    console.error("Failed to send message:", chrome.runtime.lastError.message);
-                                } else {
-                                    console.log("Form filling message sent successfully.");
-                                }
-                            });
-                            sendResponse({ success: true });
-                        } else {
-                            console.error("No valid choices in the LLM response:", JSON.stringify(data, null, 2));
-                            sendResponse({ success: false, message: 'No valid choices in the LLM response.' });
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error fetching LLM response:", error);
-                        sendResponse({ success: false, message: 'Error fetching LLM response.' });
-                    });
-
-                // Indicate that the response will be sent asynchronously
-                return true;
-            }).catch(error => {
-                sendResponse({ success: false, message: 'Failed to load context text.' });
-            });
+            // Indicate that the response will be sent asynchronously
+            return true;
         });
     }
 });
