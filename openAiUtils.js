@@ -1,7 +1,7 @@
-export async function fetchGPTResponse(apiKey, prompt, small = true) {
+export async function fetchGPTResponse(apiKey, prompt, bigModel) {
     const unknownValue = "unknown";
 
-    const model = small ? "gpt-3.5-turbo-0125" : "gpt-4o-2024-08-06";
+    const model = bigModel ?  "gpt-4o-2024-08-06" : "gpt-3.5-turbo-0125";
     console.log("using model", model);
     
     const response = await fetch("https://api.openai.com/v1/chat/completions", {

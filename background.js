@@ -1,16 +1,13 @@
 import { fetchGPTResponse } from './openAiUtils.js';
 
-
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'processForm') {
         console.log("Processing form...");
         
-        chrome.storage.sync.get(['contextText', 'apiKey'], function (data) {
+        chrome.storage.sync.get(['contextText', 'apiKey', 'modelSelection'], function (data) {
             let contextText = data.contextText || "Default context text if none is set.";
             const apiKey = data.apiKey || "";
-
-            console.log("Context Text:", contextText);
+            const model = data.modelSelection === '1';
             if (!apiKey) {
                 console.error('API Key is not set.');
                 sendResponse({ success: false, message: 'API Key is not set.' });
@@ -27,7 +24,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const prompt = generatePrompt(contextText, formData, websiteText);
             console.log("Prompt:", prompt);
 
-            fetchGPTResponse(apiKey, prompt)
+            fetchGPTResponse(apiKey, prompt, model)
                 .then(data => {
                     console.log("LLM Response:", JSON.stringify(data, null, 2));
 
