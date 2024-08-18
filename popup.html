@@ -17,13 +17,26 @@
             margin-top: 10px;
             font-weight: bold;
         }
-        input, textarea {
+        input, textarea, button {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
+        }
+        input[readonly] {
+            background-color: #e9e9e9;
+            cursor: not-allowed;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
         }
         .link {
             display: block;
@@ -39,18 +52,20 @@
 </head>
 <body>
     <h2>Auto Form Filler Settings</h2>
-    <label for="apiKey">API Key:</label>
+    <label for="apiKey">OPENAI API Key:</label>
     <input type="password" id="apiKey" placeholder="Enter your API key - it's encrypted">
     
-    <label for="contextText">Context Text:</label>
+    <label for="contextText">Paste your context text here:</label>
     <textarea id="contextText" placeholder="Enter your context text"></textarea>
     
     <h2>Shortcut Settings</h2>
-    <label for="formFillingShortcut">Form Filling Shortcut:</label>
-    <input type="text" id="formFillingShortcut" placeholder="Press keys to set shortcut" readonly>
+    <label for="formFillingShortcut">Fill entire page shortcut:</label>
+    <input type="text" id="formFillingShortcut" value="Cmd+Shift+Y" readonly>
     
-    <label for="cellFillingShortcut">Cell Filling Shortcut:</label>
-    <input type="text" id="cellFillingShortcut" placeholder="Press keys to set shortcut" readonly>
+    <label for="cellFillingShortcut">Fill current cell shortcut:</label>
+    <input type="text" id="cellFillingShortcut" value="Cmd+Shift+A" readonly>
+    
+    <button id="saveSettings">Save & Close</button>
     
     <script src="popup.js"></script>
 </body>

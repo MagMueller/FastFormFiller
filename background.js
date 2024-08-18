@@ -1,5 +1,7 @@
 import { fetchGPTResponse } from './openAiUtils.js';
 
+
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'processForm') {
         console.log("Processing form...");
@@ -16,7 +18,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             }
             
             const formData = request.data;
-            // check if data is empty
             if (!formData) {
                 console.log('Form data is empty: ' + formData);
                 sendResponse({ success: false, message: 'Form data is empty.' });
@@ -26,7 +27,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const prompt = generatePrompt(contextText, formData, websiteText);
             console.log("Prompt:", prompt);
 
-            // Call the function to fetch LLM response
             fetchGPTResponse(apiKey, prompt)
                 .then(data => {
                     console.log("LLM Response:", JSON.stringify(data, null, 2));
@@ -35,7 +35,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         const jsonResponse = parseLLMResponse(data.choices[0].message.content);
                         console.log("Parsed JSON Response:", jsonResponse);
 
-                        // Map the response back to field IDs
                         const mappedResponse = {};
                         formData.forEach((field, index) => {
                             if (jsonResponse.hasOwnProperty(index)) {
@@ -44,7 +43,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         });
                         console.log("Mapped Response:", mappedResponse);
 
-                        // Send message to content script
                         chrome.tabs.sendMessage(sender.tab.id, {
                             action: "fillForm",
                             data: mappedResponse,
@@ -52,7 +50,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                             if (chrome.runtime.lastError) {
                                 console.error("Failed to send message:", chrome.runtime.lastError.message);
                             } else {
-                                console.log("Form filling message sent successfully.");
+                                console.log("Form filling command sent successfully.");
                             }
                         });
                         sendResponse({ success: true });
@@ -65,16 +63,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     console.error("Error fetching LLM response:", error);
                     sendResponse({ success: false, message: 'Error fetching LLM response.' });
                 });
-
-            // Indicate that the response will be sent asynchronously
-            return true;
         });
+        return true; // Indicate that the response will be sent asynchronously
     }
 });
 
+chrome.commands.onCommand.addListener((command) => {
+    if (command === 'trigger_form_filling') {
+        triggerFormFilling();
+    } else if (command === 'trigger_cell_filling') {
+        triggerCellFilling();
+    }
+});
+
+function triggerFormFilling() {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, { action: 'triggerPageFill' });
+    });
+}
+
+function triggerCellFilling() {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, { action: 'triggerCurrentFieldFilling' });
+    });
+}
+
 function generatePrompt(contextText, formData, websiteText) {
-    // console.log("Form Data:", formData);   
-    // console.log("Website Text:", websiteText);
     let prompt = `Based on the following context and the website content, fill out the requested form field(s) and return the result as a JSON object where the keys are the form field indices, and the values are the corresponding answers. Ensure the response is a valid JSON object.\n\nContext:\n${contextText}\n\nWebsite Content:\n${websiteText}\n`;
     prompt += `\nForm fields to fill out given in the form (Index: Type: Label):\n`;
     formData.forEach((field, index) => {
@@ -96,28 +110,3 @@ function parseLLMResponse(response) {
         throw e;  
     }
 }
-
-chrome.commands.onCommand.addListener(function (command) {
-    console.log("Command:", command);
-    if (command === "trigger_form_filling") {
-        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, { action: "triggerPageFill" }, function(response) {
-                if (chrome.runtime.lastError) {
-                    console.error("Failed to send message:", chrome.runtime.lastError.message);
-                } else {
-                    console.log("Trigger form filling command sent successfully.");
-                }
-            });
-        });
-    } else if (command === "trigger_cell_filling") {
-        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, { action: "triggerCurrentFieldFilling" }, function(response) {
-                if (chrome.runtime.lastError) {
-                    console.error("Failed to send message:", chrome.runtime.lastError.message);
-                } else {
-                    console.log("Trigger cell filling command sent successfully.");
-                }
-            });
-        });
-    }
-});
