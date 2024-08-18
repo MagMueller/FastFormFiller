@@ -14,15 +14,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             try {
                 if (element.type === 'radio') {
                     console.log(`Setting radio value for key: ${key}, value: ${value}`);
-                    setRadioValue(key, value);
+                    setRadioValue(element, value);
                 } else if (element.type === 'checkbox') {
                     console.log(`Setting checkbox value for key: ${key}, value: ${value}`);
-                    setCheckboxValue(key, value);
+                    setCheckboxValue(element, value);
                 } else if (element.tagName.toLowerCase() === 'select') {
                     console.log(`Setting select value for key: ${key}, value: ${value}`);
                     setSelectValue(element, value);
                 } else {
-
                     setFieldValue(element, value);
                 }
             } catch (error) {
@@ -69,29 +68,27 @@ function setSelectValue(element, value) {
     }
 }
 
-function setRadioValue(key, value) {
-    const radioButton = document.querySelector(`input[id="${key}"]`);
-    console.log("radioButton", radioButton);
+function setRadioValue(element, value) {
+    const radioButton = document.querySelector(`input[id="${element.id}"]`);
     if (radioButton && radioButton.type === 'radio') {
         radioButton.checked = value === "true";
         const changeEvent = new Event('change', { bubbles: true });
         radioButton.dispatchEvent(changeEvent);
-        console.log(`Successfully set radio button: ${key} to ${value}`);
+        console.log(`Successfully set radio button: ${element.id} to ${value}`);
     } else {
-        console.log(`No matching radio button found for key: ${key}`);
+        console.log(`No matching radio button found for key: ${element.id}`);
     }
 }
 
-function setCheckboxValue(key, value) {
-    const checkbox = document.querySelector(`input[id="${key}"]`);
-    console.log("checkbox", checkbox);
+function setCheckboxValue(element, value) {
+    const checkbox = document.querySelector(`input[id="${element.id}"]`);
     if (checkbox && checkbox.type === 'checkbox') {
         checkbox.checked = value === "true";
         const changeEvent = new Event('change', { bubbles: true });
         checkbox.dispatchEvent(changeEvent);
-        console.log(`Successfully set checkbox: ${key} to ${value}`);
+        console.log(`Successfully set checkbox: ${element.id} to ${value}`);
     } else {
-        console.log(`No matching checkbox found for key: ${key}`);
+        console.log(`No matching checkbox found for key: ${element.id}`);
     }
 }
 
