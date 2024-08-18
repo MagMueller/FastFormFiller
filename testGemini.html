@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Gemini API</title>
+</head>
+<body>
+    <h1>Test Gemini API</h1>
+    <textarea id="promptInput" rows="3" cols="50" placeholder="Enter your prompt here"></textarea>
+    <br>
+    <button id="testButton">Test API</button>
+    <textarea id="responseOutput" rows="10" cols="50" readonly></textarea>
+
+    <script type="module">
+        import { fetchgeminiResponse } from './geminiUtils.js';
+
+        document.getElementById('testButton').addEventListener('click', async () => {
+            const apiKey = process.env.API_KEY;  // Using API key from .env file
+            const prompt = document.getElementById('promptInput').value;
+            const responseOutput = document.getElementById('responseOutput');
+
+            try {
+                const response = await fetchgeminiResponse(apiKey, prompt);
+                responseOutput.value = response.candidates[0].content.parts[0].text;
+            } catch (error) {
+                responseOutput.value = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
