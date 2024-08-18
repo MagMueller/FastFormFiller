@@ -47,3 +47,12 @@ Contributions are welcome! Whether it's a bug report, feature suggestion, or pul
 ---
 
 Enjoy using **Auto Form Filler** and save time on repetitive form-filling tasks!
+
+This project is licensed under the terms of the MIT license.
+
+
+## ⚠️ Important Note
+
+Please be aware that the context you provide is sent to OpenAI for processing. While we strive for accuracy, the AI-generated output may not always be correct. It is crucial that you carefully review before submitting any forms. Always double-check the output to ensure its accuracy and appropriateness for your specific needs.
+
+
