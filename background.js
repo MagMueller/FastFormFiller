@@ -4,10 +4,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'processForm') {
         console.log("Processing form...");
         
-        chrome.storage.sync.get(['contextText', 'apiKey', 'modelSelection'], function (data) {
+        chrome.storage.sync.get(['contextText', 'apiKey', 'modelSelection', 'uncertaintyHandling'], function (data) {
             let contextText = data.contextText || "Default context text if none is set.";
             const apiKey = data.apiKey || "";
-            const model = data.modelSelection === '1';
+
+            const model = data.modelSelection === 1 ? "gpt-4" : "gpt-3.5-turbo";
+            const uncertaintyInstruction = data.uncertaintyHandling === 1 ? "Use 'unknown' as the value for any fields you are not sure about." : "Guess the value creatively if unknown.";
+            console.log("Uncertainty Instruction:", uncertaintyInstruction);
+            console.log("Context Text:", contextText);
             if (!apiKey) {
                 console.error('API Key is not set.');
                 sendResponse({ success: false, message: 'API Key is not set.' });
@@ -21,7 +25,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 return;
             }
             const websiteText = request.websiteText;
-            const prompt = generatePrompt(contextText, formData, websiteText);
+            const prompt = generatePrompt(contextText, formData, websiteText, uncertaintyInstruction);
             console.log("Prompt:", prompt);
 
             fetchGPTResponse(apiKey, prompt, model)
@@ -85,10 +89,11 @@ function triggerCellFilling() {
     });
 }
 
-function generatePrompt(contextText, formData, websiteText) {
+function generatePrompt(contextText, formData, websiteText, uncertaintyInstruction) {
     let prompt = `Based on the following context and the website content, fill out the requested form field(s) and return the result as a JSON object.`;
     prompt += `In your output JSON the key musst be the Unique ID from the input list and the value is the answer. `;
-    prompt += `The output should have only the Unique IDs from the input list and the answers. If you don't know the answer, use "unknown" as the value. `;
+    prompt += uncertaintyInstruction;
+    prompt += `The output should have only the Unique IDs from the input list and the answers. `;
     prompt += `Like {1: "answer", ...}. \n\nContext:\n${contextText}\n\nWebsite Content:\n${websiteText}\n`;
     prompt += `\nForm fields to fill out given in the form (Unique ID 0: Question1, Unique ID 1: Question2, ...):\n`;
     prompt += `{`;

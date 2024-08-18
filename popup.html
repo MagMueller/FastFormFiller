@@ -108,10 +108,18 @@
     
     <h2>Model Selection</h2>
     <div class="slider-container">
-        <span class="slider-label">Small Model</span>
+        <span class="slider-label">GPT-3</span>
         <input type="range" id="modelSlider" class="slider" min="0" max="1" step="1">
-        <span class="slider-label">Big Model</span>
+        <span class="slider-label">GPT-4</span>
     </div>
+    
+    <h2>Uncertainty Handling</h2>
+    <div class="slider-container">
+        <span class="slider-label">Creative</span>
+        <input type="range" id="uncertaintySlider" class="slider" min="0" max="1" step="1">
+        <span class="slider-label">Write "unknown"</span>
+    </div>
+    <p>Specify how the model should handle uncertainty: be creative or write "unknown".</p>
     
     <button id="saveSettings">Save & Close</button>
     
