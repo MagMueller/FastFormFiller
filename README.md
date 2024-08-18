@@ -10,6 +10,16 @@
 - **Fast and Easy**
 ![Auto Form Filler Thumbnail](src/images/thumbnail.webp)
 
+## 🎥 Demo
+
+Check out this quick tutorial video to see Auto Form Filler in action:
+
+<video width="100%" controls>
+  <source src="src/images/Tutorial.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+
 ## 🛠 Installation
 
 1. Clone or download this repository.
@@ -25,7 +35,9 @@ git clone https://github.com/greenwai/auto-form-filler.git
 1. Select the "Auto Form Filler" under extensions.
 2. Enter your OpenAI API key.
 3. Provide context about you which the model should know to fill your forms.
+4. Click on the button "Save & Close" to save your context.
 
+![Tool UI](src/images/ToolUi.png)
 
 ## 💻 Usage
 
