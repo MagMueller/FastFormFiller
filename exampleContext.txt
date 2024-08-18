@@ -1,5 +1,6 @@
 **Who are we?
-
+My name is Magnus Müller CEO of greenWAI.
+magnus@greenw.ai
 greenWAI UG is a young company based in Osnabrück. We founded greenWAI in July 2023. The team currently consists of the three founders. Our greatest strength is our extensive expertise in AI, among other things, each of us studied Cognitive Science at the University of Osnabrück.
 
 greenWAI Traffic is an AI-based system for the dynamic control of traffic lights. 

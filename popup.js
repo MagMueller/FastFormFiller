@@ -1,14 +1,20 @@
 // Load saved settings when the popup opens
 document.addEventListener('DOMContentLoaded', function () {
     chrome.storage.sync.get(['apiKey', 'contextText'], function (data) {
-
         document.getElementById('apiKey').value = data.apiKey || '';
         document.getElementById('contextText').value = data.contextText || '';
     });
 });
-document.getElementById('triggerFill').addEventListener('click', function() {
+
+document.getElementById('triggerPageFill').addEventListener('click', function() {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, { action: "triggerFill" });
+        chrome.tabs.sendMessage(tabs[0].id, { action: "triggerPageFill" });
+    });
+});
+
+document.getElementById('triggerCurrentFieldFill').addEventListener('click', function() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, { action: "triggerCurrentFieldFilling" });
     });
 });
 

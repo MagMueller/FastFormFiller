@@ -1,6 +1,9 @@
-export async function fetchGPTResponse(apiKey, prompt) {
+export async function fetchGPTResponse(apiKey, prompt, small = true) {
     const unknownValue = "unknown";
 
+    const model = small ? "gpt-3.5-turbo-0125" : "gpt-4o-2024-08-06";
+    console.log("using model", model);
+    
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -8,7 +11,7 @@ export async function fetchGPTResponse(apiKey, prompt) {
             "Authorization": `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-            model: "gpt-4o-2024-08-06",
+            model: model,
             messages: [
                 { role: "system", content: "Use " + unknownValue + " as the value for any unknown fields." },
                 { role: "user", content: prompt }

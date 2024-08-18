@@ -2,6 +2,8 @@ import { fetchGPTResponse } from './openAiUtils.js';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'processForm') {
+        console.log("Processing form...");
+        
         chrome.storage.sync.get(['contextText', 'apiKey'], function (data) {
             let contextText = data.contextText || "Default context text if none is set.";
             const apiKey = data.apiKey || "";
@@ -12,7 +14,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 sendResponse({ success: false, message: 'API Key is not set.' });
                 return;
             }
+            
             const formData = request.data;
+            // check if data is empty
+            if (!formData) {
+                console.log('Form data is empty: ' + formData);
+                sendResponse({ success: false, message: 'Form data is empty.' });
+                return;
+            }
             const websiteText = request.websiteText;
             const prompt = generatePrompt(contextText, formData, websiteText);
             console.log("Prompt:", prompt);
@@ -64,10 +73,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function generatePrompt(contextText, formData, websiteText) {
-    console.log("Form Data:", formData);   
-    console.log("Website Text:", websiteText);
-    let prompt = `Based on the following context and the website content, fill out the form and return the result as a JSON object where the keys are the form field indices, and the values are the corresponding answers. Ensure the response is a valid JSON object.\n\nContext:\n${contextText}\n\nWebsite Content:\n${websiteText}\n`;
-    prompt += `\nForm fields: in the form Index: Type: Label \n`;
+    // console.log("Form Data:", formData);   
+    // console.log("Website Text:", websiteText);
+    let prompt = `Based on the following context and the website content, fill out the requested form field(s) and return the result as a JSON object where the keys are the form field indices, and the values are the corresponding answers. Ensure the response is a valid JSON object.\n\nContext:\n${contextText}\n\nWebsite Content:\n${websiteText}\n`;
+    prompt += `\nForm fields to fill out given in the form (Index: Type: Label):\n`;
     formData.forEach((field, index) => {
         prompt += `${index}: ${field.type}: ${field.label}\n`;
     });         
@@ -84,18 +93,29 @@ function parseLLMResponse(response) {
         return JSON.parse(response);
     } catch (e) {
         console.error("Failed to parse JSON from LLM response:", e);
-        throw e;  // Rethrow the error to be caught in the fetch handler
+        throw e;  
     }
 }
 
 chrome.commands.onCommand.addListener(function (command) {
+    console.log("Command:", command);
     if (command === "trigger_form_filling") {
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, { action: "triggerFill" }, function(response) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: "triggerPageFill" }, function(response) {
                 if (chrome.runtime.lastError) {
                     console.error("Failed to send message:", chrome.runtime.lastError.message);
                 } else {
-                    console.log("Trigger fill command sent successfully.");
+                    console.log("Trigger form filling command sent successfully.");
+                }
+            });
+        });
+    } else if (command === "trigger_cell_filling") {
+        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: "triggerCurrentFieldFilling" }, function(response) {
+                if (chrome.runtime.lastError) {
+                    console.error("Failed to send message:", chrome.runtime.lastError.message);
+                } else {
+                    console.log("Trigger cell filling command sent successfully.");
                 }
             });
         });

@@ -5,84 +5,67 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 10px;
-            width: 300px; /* Increase width */
-            height: 400px; /* Increase height */
+            padding: 20px;
+            background-color: #f9f9f9;
+            width: 400px; /* Make the popup wider */
         }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 34px;
-            height: 20px;
-            margin-bottom: 20px;
+        h2 {
+            color: #333;
         }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
         }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #2196F3;
-        }
-        input:checked + .slider:before {
-            transform: translateX(14px);
-        }
-        input[type="text"], textarea {
+        input, textarea, button {
             width: 100%;
-            margin-bottom: 10px;
-            padding: 5px;
-            font-size: 14px;
-        }
-        textarea {
-            height: 100px;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
         button {
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            background-color: #2196F3;
+            background-color: #4CAF50;
             color: white;
             border: none;
             cursor: pointer;
-            margin-bottom: 10px; /* Add margin to create space between buttons */
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .fill-button {
+            background-color: #007BFF;
+        }
+        .fill-button:hover {
+            background-color: #0056b3;
+        }
+        .link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <h2>Auto Form Filler</h2>
-
-    <h3>API Key</h3>
+    <label for="apiKey">API Key:</label>
     <input type="password" id="apiKey" placeholder="Enter your API key - it's encrypted">
-
-    <h3>Context Text</h3>
-    <textarea id="contextText" placeholder="Enter your context text"></textarea>
-
-    <button id="saveSettings">Save Settings</button>
     
-    <button id="triggerFill">Fill Form or 'press cmd + shift + A' </button>
-
+    <label for="contextText">Context Text:</label>
+    <textarea id="contextText" placeholder="Enter your context text"></textarea>
+    
+    <button id="saveSettings">Save Settings</button>
+    <button id="triggerPageFill" class="fill-button">Fill Form</button>
+    <button id="triggerCurrentFieldFill" class="fill-button">Fill Current Field</button>
+    
+    <a href="options.html" target="_blank" class="link">Customize Shortcuts</a>
+    
     <script src="popup.js"></script>
 </body>
 </html>
