@@ -1,4 +1,4 @@
-export async function fetchLLMResponse(apiKey, prompt) {
+export async function fetchGPTResponse(apiKey, prompt) {
     const unknownValue = "unknown";
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
