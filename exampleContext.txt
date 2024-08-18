@@ -1,0 +1,38 @@
+My name is Magnus Müller CEO of greenWAI.
+magnus@greenw.ai
+My startup:
+greenWAI UG is a young company based in Osnabrück. We founded greenWAI in July 2023. The team currently consists of the three founders. Our greatest strength is our extensive expertise in AI, among other things, each of us studied Cognitive Science at the University of Osnabrück.
+
+greenWAI Traffic is an AI-based system for the dynamic control of traffic lights. 
+
+**What are we developing?** greenWAI Traffic
+
+The system flexibly integrates various data sources. The most important data is “Floating Car Data”, e.g. from INRIX, as this is basically available everywhere.
+
+This data is evaluated directly by the AI in order to dynamically adapt the circuits to the current traffic situation.
+
+Our system is characterized in particular by the low investment required for its use. In contrast to similar solutions, for example, no new sensors need to be procured.
+
+The following are the key features of the system:
+
+1. **Whole network:** Optimization takes place in the context of the whole network, not locally.
+2 **Centralized:** The system communicates the circuits to the traffic computer.
+3 **AI:** The control is implemented using the latest AI methods, which enables a high degree of flexibility, among other things.
+4 **Retrofit:** The system is based on the existing infrastructure.
+5 **All road users:** The AI takes all road users into account.
+6 **Proactive:** The AI is able to assess the impact of major disruptions to the traffic network, e.g. roadworks, and adapt the circuits throughout the network accordingly.
+7 **Configurable:** The AI can incorporate various objectives, such as the prioritization of public transport or cyclists, into its decisions. This can be configured via an intuitive user interface.
+
+**Where do we stand?
+
+We have demonstrated the performance of our system in traffic simulations, e.g. for the city of Hamburg. In a BMDV competition, our demonstration won us the opportunity to further develop our system in a comprehensive funding project. We are currently in the second phase of the application process, the project is scheduled to start on August 1st and will run for two and a half years. A pilot is already planned for Osnabrück next year as part of the project. Our aim is to implement further pilot projects in other cities.
+
+Information about the service provider.
+
+greenWAI UG
+
+Postal address: Albert-Einstein-Straße 1, 49076 Osnabrück
+Registered office: Osnabrück
+
+E-mail: magnus@greenw.ai
+
