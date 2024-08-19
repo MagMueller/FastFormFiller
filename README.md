@@ -1,5 +1,5 @@
-# Auto Form Filler
-<img src="src/images/thumbnail.webp" alt="Auto Form Filler Thumbnail" width="500"/>
+# Fast Form Filler
+<img src="src/images/thumbnail.webp" alt="Fast Form Filler Thumbnail" width="500"/>
 
 
 
@@ -15,13 +15,14 @@
 
 ## 🎥 Demo
 
-Check out [this quick demo video](https://www.loom.com/embed/701d8d4fc7cb464e9c908f1910db6dbd?sid=43dfd79d-c17d-424d-a908-00bb31767ef6) to see Auto Form Filler in action:
+Check out [this quick tutorial](https://www.loom.com/embed/701d8d4fc7cb464e9c908f1910db6dbd?sid=43dfd79d-c17d-424d-a908-00bb31767ef6) video to see Fast Form Filler in action:
 
 <!-- This video tag will not render on GitHub but may work on other platforms -->
 <video width="100%" controls>
   <source src="src/images/Tutorial.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
+
 
 ## 🛠 Installation
 
@@ -35,7 +36,7 @@ Check out [this quick demo video](https://www.loom.com/embed/701d8d4fc7cb464e9c9
 
 ## 📋 Getting Started
 
-1. Select the "Auto Form Filler" under extensions.
+1. Select the "Fast Form Filler" under extensions.
 2. Enter your OpenAI API key.
 3. Provide context about you which the model should know to fill your forms.
 4. Click on the button "Save & Close" to save your context.
@@ -62,10 +63,12 @@ Contributions are welcome! Whether it's a bug report, feature suggestion, or pul
 
 ---
 
-Enjoy using **Auto Form Filler** and save time on repetitive form-filling tasks!
+Enjoy using **Fast Form Filler** and save time on repetitive form-filling tasks!
 
 This project is licensed under the terms of the MIT license.
 
 ## ⚠️ Important Note
 
 Please be aware that the context you provide is sent to OpenAI for processing. While we strive for accuracy, the AI-generated output may not always be correct. It is crucial that you carefully review before submitting any forms. Always double-check the output to ensure its accuracy and appropriateness for your specific needs.
+
+

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Auto Form Filler",
+  "name": "Fast Form Filler",
   "version": "1.0",
-  "description": "Automatically fill forms using an LLM",
+  "description": "Automatically fill forms using AI",
   "permissions": ["storage", "activeTab", "scripting", "commands"],
   "background": {
       "service_worker": "src/background/background.js",
